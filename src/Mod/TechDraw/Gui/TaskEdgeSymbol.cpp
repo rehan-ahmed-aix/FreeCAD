@@ -36,7 +36,7 @@ EdgeSvgString::EdgeSvgString(int width, int height)
     svgStream << "<svg width='" << width << "' height='" << height << "'>\n";
 }
 
-void EdgeSvgString::addLine(double xStart, double yStart, double xEnd, double yEnd, double width)
+void EdgeSvgString::addLine(int xStart, int yStart, int xEnd, int yEnd, int width)
 {
     svgStream << "<path stroke='#000' stroke-width='" << width << "' d='";
     svgStream << " M" << xStart << ", " << yStart;
@@ -44,7 +44,7 @@ void EdgeSvgString::addLine(double xStart, double yStart, double xEnd, double yE
     svgStream << "' />\n";
 }
 
-void EdgeSvgString::addText(double xText, double yText, const std::string& text, double size, const std::string& anchor)
+void EdgeSvgString::addText(int xText, int yText, const std::string& text, int size, const std::string& anchor)
 {
     svgStream << "<text x='" << xText << "' y='" << yText;
     svgStream << "' style='font-size:" << size << "px; font-family: sans-serif;' text-anchor='" << anchor << "'>" << text << "</text>\n";
@@ -52,14 +52,14 @@ void EdgeSvgString::addText(double xText, double yText, const std::string& text,
 
 
 
-void EdgeSvgString::addArrow(double xStart, double yStart, double xEnd, double yEnd)
+void EdgeSvgString::addArrow(int xStart, int yStart, int xEnd, int yEnd)
 {
     // Draw the leader line
     svgStream << "<g><path d='M" << xStart << "," << yStart << " L" << xEnd << "," << yEnd 
               << "' stroke='#000000' stroke-width='1' /></g>\n";
               
     // Calculate angle for the arrow head
-    double angle = atan2(yEnd - yStart, xEnd - xStart) * 180.0 / 3.14159265358979323846;
+    int angle = static_cast<int>(atan2(yEnd - yStart, xEnd - xStart) * 180.0 / 3.14159265358979323846);
     
     // Draw an explicit triangle for the arrow head (since QtSvg doesn't support markers)
     // The triangle points back towards the start
@@ -229,6 +229,8 @@ bool TaskEdgeSymbol::accept()
     }
 
     Gui::Command::commitCommand();
+    if (symbol) symbol->recomputeFeature();
+    if (page) page->recomputeFeature();
     return true;
 }
 

@@ -26,9 +26,9 @@ class EdgeSvgString
 
 public:
     EdgeSvgString(int width, int height);
-    void addLine(double xStart, double yStart, double xEnd, double yEnd, double width=1.0);
-    void addText(double xText, double yText, const std::string& text, double size=18.0, const std::string& anchor="middle");
-    void addArrow(double xStart, double yStart, double xEnd, double yEnd);
+    void addLine(int xStart, int yStart, int xEnd, int yEnd, int width=1);
+    void addText(int xText, int yText, const std::string& text, int size=18, const std::string& anchor="middle");
+    void addArrow(int xStart, int yStart, int xEnd, int yEnd);
     std::string finish();
 };
 
