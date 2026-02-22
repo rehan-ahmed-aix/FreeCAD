@@ -31,7 +31,7 @@ using namespace TechDrawGui;
 EdgeSvgString::EdgeSvgString(int width, int height)
 {
     svgStream << "<?xml version='1.0'?>\n";
-    svgStream << "<svg width='" << width << "' height='" << height << "' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'>\n";
+    svgStream << "<svg width='" << width << "' height='" << height << "'>\n";
 }
 
 void EdgeSvgString::addLine(double xStart, double yStart, double xEnd, double yEnd, double width)
@@ -214,8 +214,16 @@ bool TaskEdgeSymbol::accept()
     if (!page && view) {
         page = view->findParentPage();
     }
+    
+    // Fallback: If no page was explicitly selected or found via view, find the active page
+    if (!page) {
+        page = TechDrawGui::DrawGuiUtil::findPage(nullptr);
+    }
+    
     if (page) {
         page->addView(symbol);
+    } else {
+        Base::Console().Warning("EdgeSymbol: Could not find a suitable TechDraw Page to attach to.\n");
     }
 
     Gui::Command::commitCommand();
