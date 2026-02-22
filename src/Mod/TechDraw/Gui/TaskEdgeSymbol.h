@@ -25,7 +25,7 @@ class EdgeSvgString
     std::stringstream svgStream;
 
 public:
-    SvgString(int width, int height);
+    EdgeSvgString(int width, int height);
     void addLine(double xStart, double yStart, double xEnd, double yEnd, double width=1.0);
     void addText(double xText, double yText, const std::string& text, double size=18.0, const std::string& anchor="middle");
     void addArrow(double xStart, double yStart, double xEnd, double yEnd);

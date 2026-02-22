@@ -28,7 +28,7 @@ using namespace Gui;
 using namespace TechDraw;
 using namespace TechDrawGui;
 
-EdgeSvgString::SvgString(int width, int height)
+EdgeSvgString::EdgeSvgString(int width, int height)
 {
     svgStream << "<?xml version='1.0'?>\n";
     svgStream << "<svg width='" << width << "' height='" << height << "' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'>\n";
@@ -126,7 +126,7 @@ TaskEdgeSymbol::TaskEdgeSymbol(const std::string &ownerName) :
     connect(ui->cbEdgeType, &QComboBox::currentTextChanged, this, &TaskEdgeSymbol::onParametersChanged);
     connect(ui->leUpper, &QLineEdit::textChanged, this, &TaskEdgeSymbol::onParametersChanged);
     connect(ui->leLower, &QLineEdit::textChanged, this, &TaskEdgeSymbol::onParametersChanged);
-    connect(ui->cbLeader, &QCheckBox::stateChanged, this, &TaskEdgeSymbol::onParametersChanged);
+    connect(ui->cbLeader, &QCheckBox::toggled, this, &TaskEdgeSymbol::onParametersChanged);
 
     onParametersChanged();
 }
