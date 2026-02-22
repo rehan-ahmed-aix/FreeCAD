@@ -246,6 +246,7 @@ Gui::MenuItem* Workbench::setupMenuBar() const
     symbols->setCommand("Symbols");
     *symbols << "TechDraw_WeldSymbol";
     *symbols << "TechDraw_SurfaceFinishSymbols";
+    *symbols << "TechDraw_EdgeSymbol";
     *symbols << "TechDraw_HoleShaftFit";
 
 
@@ -397,6 +398,7 @@ Gui::ToolBarItem* Workbench::setupToolBars() const
     *anno << "TechDraw_ShowAll";
     *anno << "TechDraw_WeldSymbol";
     *anno << "TechDraw_SurfaceFinishSymbols";
+    *anno << "TechDraw_EdgeSymbol";
     *anno << "TechDraw_HoleShaftFit";
     return root;
 }
@@ -494,6 +496,7 @@ Gui::ToolBarItem* Workbench::setupCommandBars() const
     *anno << "TechDraw_ShowAll";
     *anno << "TechDraw_WeldSymbol";
     *anno << "TechDraw_SurfaceFinishSymbols";
+    *anno << "TechDraw_EdgeSymbol";
     *anno << "TechDraw_HoleShaftFit";
 
     return root;

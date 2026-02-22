@@ -53,6 +53,7 @@
 #include "TaskLineDecor.h"
 #include "TaskRichAnno.h"
 #include "TaskSurfaceFinishSymbols.h"
+#include "TaskEdgeSymbol.h"
 #include "TaskWeldingSymbol.h"
 #include "ViewProviderViewPart.h"
 #include "CommandHelpers.h"
@@ -1509,6 +1510,62 @@ bool CmdTechDrawSurfaceFinishSymbols::isActive()
     return havePage && haveView;
 }
 
+
+//===========================================================================
+// TechDraw_EdgeSymbol
+//===========================================================================
+
+DEF_STD_CMD_A(CmdTechDrawEdgeSymbol)
+
+CmdTechDrawEdgeSymbol::CmdTechDrawEdgeSymbol()
+  : Command("TechDraw_EdgeSymbol")
+{
+    sAppModule      = "TechDraw";
+    sGroup          = QT_TR_NOOP("TechDraw");
+    sMenuText       = QT_TR_NOOP("Edge Symbol");
+    sToolTipText    = QT_TR_NOOP("Add an Edge Symbol (ISO 13715)");
+    sWhatsThis      = "TechDraw_EdgeSymbol";
+    sStatusTip      = sToolTipText;
+    sPixmap         = "actions/TechDraw_EdgeSymbol";
+}
+
+void CmdTechDrawEdgeSymbol::activated(int iMsg)
+{
+    Q_UNUSED(iMsg);
+
+    Gui::TaskView::TaskDialog *dlg = Gui::Control().activeDialog();
+    if (dlg) {
+        QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Edge Symbol"),
+                             QObject::tr("Close active task dialog and try again."));
+        return;
+    }
+
+    std::vector<Gui::SelectionObject> selection = getSelection().getSelectionEx();
+    std::string ownerName;
+    if (!selection.empty()) {
+        ownerName = selection[0].getAsPropertyLinkSubString();
+    } else {
+        auto page = TechDrawGui::DrawGuiUtil::findPage(this);
+        if (page) {
+            ownerName = page->getNameInDocument();
+        }
+    }
+
+    if (ownerName.empty()) {
+        QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Edge Symbol"),
+                             QObject::tr("No page or view selected."));
+        return;
+    }
+
+    Gui::Control().showDialog(new TechDrawGui::TaskDlgEdgeSymbol(ownerName));
+}
+
+bool CmdTechDrawEdgeSymbol::isActive()
+{
+    bool havePage = TechDrawGui::DrawGuiUtil::needPage(this);
+    return havePage;
+}
+
 void CreateTechDrawCommandsAnnotate()
 {
     Gui::CommandManager &rcCmdMgr = Gui::Application::Instance->commandManager();
@@ -1530,5 +1587,6 @@ void CreateTechDrawCommandsAnnotate()
     rcCmdMgr.addCommand(new CmdTechDrawShowAll());
     rcCmdMgr.addCommand(new CmdTechDrawWeldSymbol());
     rcCmdMgr.addCommand(new CmdTechDrawSurfaceFinishSymbols());
+    rcCmdMgr.addCommand(new CmdTechDrawEdgeSymbol());
 }
 
