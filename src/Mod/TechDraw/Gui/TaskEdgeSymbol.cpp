@@ -3,6 +3,8 @@
 #include <cmath>
 #include "TaskEdgeSymbol.h"
 #include "ui_TaskEdgeSymbol.h"
+#include "DrawGuiUtil.h"
+#include <Base/Console.h>
 
 #include <App/Application.h>
 #include <App/Document.h>
@@ -223,7 +225,7 @@ bool TaskEdgeSymbol::accept()
     if (page) {
         page->addView(symbol);
     } else {
-        Base::Console().Warning("EdgeSymbol: Could not find a suitable TechDraw Page to attach to.\n");
+        Base::Console().warning("EdgeSymbol: Could not find a suitable TechDraw Page to attach to.\n");
     }
 
     Gui::Command::commitCommand();
