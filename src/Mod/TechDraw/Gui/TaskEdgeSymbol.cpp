@@ -28,13 +28,13 @@ using namespace Gui;
 using namespace TechDraw;
 using namespace TechDrawGui;
 
-SvgString::SvgString(int width, int height)
+EdgeSvgString::SvgString(int width, int height)
 {
     svgStream << "<?xml version='1.0'?>\n";
     svgStream << "<svg width='" << width << "' height='" << height << "' viewBox='0 0 120 120' xmlns='http://www.w3.org/2000/svg'>\n";
 }
 
-void SvgString::addLine(double xStart, double yStart, double xEnd, double yEnd, double width)
+void EdgeSvgString::addLine(double xStart, double yStart, double xEnd, double yEnd, double width)
 {
     svgStream << "<path stroke='#000' stroke-width='" << width << "' d='";
     svgStream << " M" << xStart << ", " << yStart;
@@ -42,7 +42,7 @@ void SvgString::addLine(double xStart, double yStart, double xEnd, double yEnd, 
     svgStream << "' />\n";
 }
 
-void SvgString::addText(double xText, double yText, const std::string& text, double size, const std::string& anchor)
+void EdgeSvgString::addText(double xText, double yText, const std::string& text, double size, const std::string& anchor)
 {
     svgStream << "<text x='" << xText << "' y='" << yText;
     svgStream << "' style='font-size:" << size << "px; font-family: sans-serif;' text-anchor='" << anchor << "'>" << text << "</text>\n";
@@ -50,14 +50,14 @@ void SvgString::addText(double xText, double yText, const std::string& text, dou
 
 
 
-void SvgString::addArrow(double xStart, double yStart, double xEnd, double yEnd)
+void EdgeSvgString::addArrow(double xStart, double yStart, double xEnd, double yEnd)
 {
     // Draw the leader line
     svgStream << "<g><path d='M" << xStart << "," << yStart << " L" << xEnd << "," << yEnd 
               << "' stroke='#000000' stroke-width='1' /></g>\n";
               
     // Calculate angle for the arrow head
-    double angle = atan2(yEnd - yStart, xEnd - xStart) * 180.0 / M_PI;
+    double angle = atan2(yEnd - yStart, xEnd - xStart) * 180.0 / 3.14159265358979323846;
     
     // Draw an explicit triangle for the arrow head (since QtSvg doesn't support markers)
     // The triangle points back towards the start
@@ -66,7 +66,7 @@ void SvgString::addArrow(double xStart, double yStart, double xEnd, double yEnd)
     svgStream << "fill='#000000' stroke='#000000' stroke-linejoin='miter' /></g>\n";
 }
 
-std::string SvgString::finish()
+std::string EdgeSvgString::finish()
 {
     svgStream << "</svg>\n";
     return svgStream.str();
@@ -158,7 +158,7 @@ void TaskEdgeSymbol::updatePreview()
 
 std::string TaskEdgeSymbol::buildSvg()
 {
-    SvgString svg(100, 100);
+    EdgeSvgString svg(100, 100);
     
     std::string type = ui->cbEdgeType->currentText().toStdString();
     std::string upper = ui->leUpper->text().toStdString();

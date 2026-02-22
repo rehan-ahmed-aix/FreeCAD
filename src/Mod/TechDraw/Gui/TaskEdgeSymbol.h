@@ -20,7 +20,7 @@ namespace TechDrawGui
 {
 class Ui_TaskEdgeSymbol;
 
-class SvgString
+class EdgeSvgString
 {
     std::stringstream svgStream;
 
