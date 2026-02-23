@@ -54,6 +54,7 @@
 #include "TaskRichAnno.h"
 #include "TaskSurfaceFinishSymbols.h"
 #include "TaskEdgeSymbol.h"
+#include <Mod/TechDraw/App/DrawEdgeSymbol.h>
 #include "TaskWeldingSymbol.h"
 #include "ViewProviderViewPart.h"
 #include "CommandHelpers.h"
@@ -1535,29 +1536,39 @@ void CmdTechDrawEdgeSymbol::activated(int iMsg)
 
     Gui::TaskView::TaskDialog *dlg = Gui::Control().activeDialog();
     if (dlg) {
-        QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Edge Symbol"),
-                             QObject::tr("Close active task dialog and try again."));
+        QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Task in progress"),
+            QObject::tr("Close active task dialog and try again"));
         return;
     }
 
-    std::vector<Gui::SelectionObject> selection = getSelection().getSelectionEx();
-    std::string ownerName;
-    if (!selection.empty()) {
-        ownerName = selection[0].getAsPropertyLinkSubString();
-    } else {
-        auto page = TechDrawGui::DrawGuiUtil::findPage(this);
-        if (page) {
-            ownerName = page->getNameInDocument();
-        }
-    }
-
-    if (ownerName.empty()) {
-        QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Edge Symbol"),
-                             QObject::tr("No page or view selected."));
+    TechDraw::DrawPage* page = DrawGuiUtil::findPage(this);
+    if (!page) {
         return;
     }
 
-    Gui::Control().showDialog(new TechDrawGui::TaskDlgEdgeSymbol(ownerName));
+    std::vector<App::DocumentObject*> leaders = getSelection().
+                                         getObjectsOfType(TechDraw::DrawLeaderLine::getClassTypeId());
+    std::vector<App::DocumentObject*> edges = getSelection().
+                                         getObjectsOfType(TechDraw::DrawEdgeSymbol::getClassTypeId());
+    TechDraw::DrawLeaderLine* leadFeat = nullptr;
+    TechDraw::DrawEdgeSymbol* edgeFeat = nullptr;
+    if ( (leaders.size() != 1) &&
+         (edges.size() != 1) ) {
+        QMessageBox::warning(Gui::getMainWindow(), QObject::tr("Wrong selection"),
+            QObject::tr("Select exactly one leader line or one edge symbol"));
+        return;
+    }
+    if (!leaders.empty()) {
+        leadFeat = static_cast<TechDraw::DrawLeaderLine*> (leaders.front());
+        Gui::Control().showDialog(new TechDrawGui::TaskDlgEdgeSymbol(leadFeat));
+        return;
+    }
+
+    if (!edges.empty()) {
+        edgeFeat = static_cast<TechDraw::DrawEdgeSymbol*> (edges.front());
+        Gui::Control().showDialog(new TechDrawGui::TaskDlgEdgeSymbol(edgeFeat));
+        return;
+    }
 }
 
 bool CmdTechDrawEdgeSymbol::isActive()

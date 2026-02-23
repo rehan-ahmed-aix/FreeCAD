@@ -405,7 +405,9 @@ SET(TechDrawGuiViewProvider_SRCS
     ViewProviderTile.cpp
     ViewProviderTile.h
     ViewProviderWeld.cpp
+    ViewProviderEdgeSymbol.cpp
     ViewProviderWeld.h
+    ViewProviderEdgeSymbol.h
     ViewProviderCosmeticExtension.cpp
     ViewProviderCosmeticExtension.h
 )

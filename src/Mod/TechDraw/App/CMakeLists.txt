@@ -40,6 +40,7 @@ generate_from_py(CosmeticVertex)
 generate_from_py(DrawTile)
 generate_from_py(DrawTileWeld)
 generate_from_py(DrawWeldSymbol)
+generate_from_py(DrawEdgeSymbol)
 generate_from_py(CosmeticExtension)
 generate_from_py(DrawBrokenView)
 
@@ -113,7 +114,9 @@ SET(Draw_SRCS
     DrawTileWeld.cpp
     DrawTileWeld.h
     DrawWeldSymbol.cpp
+    DrawEdgeSymbol.cpp
     DrawWeldSymbol.h
+    DrawEdgeSymbol.h
     FeatureProjection.cpp
     FeatureProjection.h
     DrawBrokenView.cpp
@@ -239,7 +242,9 @@ SET(Python_SRCS
     DrawTileWeld.pyi
     DrawTileWeldPyImp.cpp
     DrawWeldSymbol.pyi
+    DrawEdgeSymbol.pyi
     DrawWeldSymbolPyImp.cpp
+    DrawEdgeSymbolPyImp.cpp
     CosmeticExtension.pyi
     CosmeticExtensionPyImp.cpp
     DrawBrokenView.pyi

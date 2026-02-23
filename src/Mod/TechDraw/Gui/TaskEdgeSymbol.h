@@ -4,40 +4,25 @@
 #include <Gui/TaskView/TaskDialog.h>
 #include <Gui/TaskView/TaskView.h>
 #include <QWidget>
-#include <Base/Vector3D.h>
-#include <sstream>
+#include <QGraphicsScene>
 #include <memory>
-#include <vector>
 
-class QGraphicsScene;
-class QGraphicsPixmapItem;
-
-namespace App {
-class DocumentObject;
+namespace TechDraw {
+    class DrawEdgeSymbol;
+    class DrawLeaderLine;
 }
 
 namespace TechDrawGui
 {
 class Ui_TaskEdgeSymbol;
 
-class EdgeSvgString
-{
-    std::stringstream svgStream;
-
-public:
-    EdgeSvgString(int width, int height);
-    void addLine(int xStart, int yStart, int xEnd, int yEnd, int width=1);
-    void addText(int xText, int yText, const std::string& text, int size=18, const std::string& anchor="middle");
-    void addArrow(int xStart, int yStart, int xEnd, int yEnd);
-    std::string finish();
-};
-
 class TaskEdgeSymbol : public QWidget
 {
     Q_OBJECT
 
 public:
-    explicit TaskEdgeSymbol(const std::string &ownerName);
+    explicit TaskEdgeSymbol(TechDraw::DrawLeaderLine *leader);
+    explicit TaskEdgeSymbol(TechDraw::DrawEdgeSymbol *symbol);
     ~TaskEdgeSymbol() override = default;
 
     virtual bool accept();
@@ -47,15 +32,16 @@ protected:
     void changeEvent(QEvent *event) override;
 
 private:
-    std::string buildSvg();
+    void init();
     void updatePreview();
+    void updateFeature();
 
-    App::DocumentObject *owner;
-    Base::Vector3d placement;
+    TechDraw::DrawEdgeSymbol* m_symbol;
+    TechDraw::DrawLeaderLine* m_leader;
+    bool m_createMode;
     
     QGraphicsScene* symbolScene;
     std::unique_ptr<Ui_TaskEdgeSymbol> ui;
-    QColor getPenColor();
 
 private Q_SLOTS:
     void onParametersChanged();
@@ -67,7 +53,8 @@ class TaskDlgEdgeSymbol : public Gui::TaskView::TaskDialog
     Q_OBJECT
 
 public:
-    explicit TaskDlgEdgeSymbol(const std::string &ownerName);
+    explicit TaskDlgEdgeSymbol(TechDraw::DrawLeaderLine *leader);
+    explicit TaskDlgEdgeSymbol(TechDraw::DrawEdgeSymbol *symbol);
     ~TaskDlgEdgeSymbol() override;
 
     void open() override {}

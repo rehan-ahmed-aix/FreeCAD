@@ -54,6 +54,7 @@
 #include "DrawViewSpreadsheet.h"
 #include "DrawViewSymbol.h"
 #include "DrawWeldSymbol.h"
+#include "DrawEdgeSymbol.h"
 #include "FeatureProjection.h"
 #include "LandmarkDimension.h"
 #include "PropertyCenterLineList.h"
@@ -116,6 +117,7 @@ PyMOD_INIT_FUNC(TechDraw)
     TechDraw::DrawTile            ::init();
     TechDraw::DrawTileWeld        ::init();
     TechDraw::DrawWeldSymbol      ::init();
+    TechDraw::DrawEdgeSymbol      ::init();
     TechDraw::DrawBrokenView      ::init();
 
     TechDraw::PropertyGeomFormatList::init();
@@ -146,6 +148,7 @@ PyMOD_INIT_FUNC(TechDraw)
     TechDraw::DrawTilePython      ::init();
     TechDraw::DrawTileWeldPython  ::init();
     TechDraw::DrawWeldSymbolPython::init();
+    TechDraw::DrawEdgeSymbolPython::init();
     TechDraw::DrawBrokenViewPython::init();
 
     TechDraw::LineFormat::initCurrentLineFormat();

@@ -1,10 +1,13 @@
+#include "PreCompiled.h"
 #include <QGraphicsSvgItem>
 #include <QSvgRenderer>
+#include <QComboBox>
+#include <QLineEdit>
 #include <cmath>
+#include <sstream>
+
 #include "TaskEdgeSymbol.h"
 #include "ui_TaskEdgeSymbol.h"
-#include "DrawGuiUtil.h"
-#include <Base/Console.h>
 
 #include <App/Application.h>
 #include <App/Document.h>
@@ -12,123 +15,54 @@
 #include <Gui/Command.h>
 #include <Gui/Application.h>
 #include <Gui/Document.h>
+
+#include <Mod/TechDraw/App/DrawEdgeSymbol.h>
+#include <Mod/TechDraw/App/DrawLeaderLine.h>
 #include <Mod/TechDraw/App/DrawPage.h>
 #include <Mod/TechDraw/App/DrawUtil.h>
-#include <Mod/TechDraw/App/DrawViewSymbol.h>
 
-#include "QGIView.h"
-#include "ViewProviderSymbol.h"
+#include "ViewProviderEdgeSymbol.h"
 #include "ZVALUE.h"
-
-#include <QGraphicsScene>
-#include <QGraphicsPixmapItem>
-#include <QLineEdit>
-#include <QComboBox>
-#include <QCheckBox>
+#include "QGIView.h"
+#include "DrawGuiUtil.h"
+#include <Base/Console.h>
 
 using namespace Gui;
 using namespace TechDraw;
 using namespace TechDrawGui;
 
-EdgeSvgString::EdgeSvgString(int width, int height)
+TaskEdgeSymbol::TaskEdgeSymbol(TechDraw::DrawLeaderLine *leader) :
+    ui(new Ui_TaskEdgeSymbol), m_symbol(nullptr), m_leader(leader), m_createMode(true)
 {
-    svgStream << "<?xml version='1.0'?>\n";
-    svgStream << "<svg width='" << width << "' height='" << height << "'>\n";
+    init();
 }
 
-void EdgeSvgString::addLine(int xStart, int yStart, int xEnd, int yEnd, int width)
+TaskEdgeSymbol::TaskEdgeSymbol(TechDraw::DrawEdgeSymbol *symbol) :
+    ui(new Ui_TaskEdgeSymbol), m_symbol(symbol), m_leader(nullptr), m_createMode(false)
 {
-    svgStream << "<path stroke='#000' stroke-width='" << width << "' d='";
-    svgStream << " M" << xStart << ", " << yStart;
-    svgStream << " L" << xEnd << ", " << yEnd;
-    svgStream << "' />\n";
-}
-
-void EdgeSvgString::addText(int xText, int yText, const std::string& text, int size, const std::string& anchor)
-{
-    svgStream << "<text x='" << xText << "' y='" << yText;
-    svgStream << "' style='font-size:" << size << "px; font-family: sans-serif;' text-anchor='" << anchor << "'>" << text << "</text>\n";
-}
-
-
-
-void EdgeSvgString::addArrow(int xStart, int yStart, int xEnd, int yEnd)
-{
-    // Draw the leader line
-    svgStream << "<g><path d='M" << xStart << "," << yStart << " L" << xEnd << "," << yEnd 
-              << "' stroke='#000000' stroke-width='1' /></g>\n";
-              
-    // Calculate angle for the arrow head
-    int angle = static_cast<int>(atan2(yEnd - yStart, xEnd - xStart) * 180.0 / 3.14159265358979323846);
-    
-    // Draw an explicit triangle for the arrow head (since QtSvg doesn't support markers)
-    // The triangle points back towards the start
-    svgStream << "<g transform='translate(" << xEnd << "," << yEnd << ")'> ";
-    svgStream << "<path transform='rotate(" << angle << ")' d='M 0.0,0.0 -12.0,3.0 -12.0,-3.0 0.0,0.0 Z' ";
-    svgStream << "fill='#000000' stroke='#000000' stroke-linejoin='miter' /></g>\n";
-}
-
-std::string EdgeSvgString::finish()
-{
-    svgStream << "</svg>\n";
-    return svgStream.str();
-}
-
-TaskEdgeSymbol::TaskEdgeSymbol(const std::string &ownerName) :
-    ui(new Ui_TaskEdgeSymbol)
-{
-    App::Document *doc = Gui::Application::Instance->activeDocument()->getDocument();
-    if (doc) {
-        owner = doc->getObject(ownerName.c_str());
-        std::string subName;
-        if (!owner) {
-            size_t dot = ownerName.rfind('.');
-            if (dot != std::string::npos) {
-                subName = ownerName.substr(dot + 1);
-                owner = doc->getObject(ownerName.substr(0, dot).c_str());
-            }
-        }
-
-        auto page = dynamic_cast<TechDraw::DrawPage *>(owner);
-        if (page) {
-            placement.x = page->getPageWidth()/2.0;
-            placement.y = page->getPageHeight()/2.0;
-        }
-
-        auto viewPart = dynamic_cast<TechDraw::DrawViewPart *>(owner);
-        if (viewPart && !subName.empty()) {
-            std::string subType = DrawUtil::getGeomTypeFromName(subName);
-            if (subType == "Vertex") {
-                TechDraw::VertexPtr vertex = viewPart->getVertex(subName);
-                if (vertex) {
-                    placement = vertex->point();
-                }
-            }
-            else if (subType == "Edge") {
-                TechDraw::BaseGeomPtr edge = viewPart->getEdge(subName);
-                if (edge) {
-                    placement = edge->getMidPoint();
-                }
-            }
-            else if (subType == "Face") {
-                TechDraw::FacePtr face = viewPart->getFace(subName);
-                if (face) {
-                    placement = face->getCenter();
-                }
-            }
-            placement = DrawUtil::invertY(placement);
-        }
+    if (m_symbol) {
+        m_leader = dynamic_cast<TechDraw::DrawLeaderLine*>(m_symbol->Leader.getValue());
     }
+    init();
+}
 
+void TaskEdgeSymbol::init()
+{
     ui->setupUi(this);
     
     symbolScene = new QGraphicsScene(this);
     ui->graphicsView->setScene(symbolScene);
 
+    if (m_symbol) {
+        ui->cbEdgeType->setCurrentText(QString::fromStdString(m_symbol->EdgeType.getValue()));
+        ui->leUpper->setText(QString::fromStdString(m_symbol->UpperDeviation.getValue()));
+        ui->leLower->setText(QString::fromStdString(m_symbol->LowerDeviation.getValue()));
+        ui->leAngle->setText(QString::number(m_symbol->Rotation.getValue()));
+    }
+
     connect(ui->cbEdgeType, &QComboBox::currentTextChanged, this, &TaskEdgeSymbol::onParametersChanged);
     connect(ui->leUpper, &QLineEdit::textChanged, this, &TaskEdgeSymbol::onParametersChanged);
     connect(ui->leLower, &QLineEdit::textChanged, this, &TaskEdgeSymbol::onParametersChanged);
-    connect(ui->cbLeader, &QCheckBox::toggled, this, &TaskEdgeSymbol::onParametersChanged);
 
     onParametersChanged();
 }
@@ -149,7 +83,43 @@ void TaskEdgeSymbol::onParametersChanged()
 void TaskEdgeSymbol::updatePreview()
 {
     symbolScene->clear();
-    std::string svg = buildSvg();
+    
+    std::stringstream svgStream;
+    svgStream << "<?xml version='1.0'?>\n";
+    svgStream << "<svg width='100' height='100'>\n";
+    
+    std::string type = ui->cbEdgeType->currentText().toStdString();
+    std::string upper = ui->leUpper->text().toStdString();
+    std::string lower = ui->leLower->text().toStdString();
+
+    auto addLine = [&svgStream](int x1, int y1, int x2, int y2, int w) {
+        svgStream << "<path stroke='#000' stroke-width='" << w << "' d=' M" << x1 << ", " << y1 << " L" << x2 << ", " << y2 << "' />\n";
+    };
+    auto addText = [&svgStream](int x, int y, const std::string& txt, int sz, const std::string& anchor) {
+        svgStream << "<text x='" << x << "' y='" << y << "' style='font-size:" << sz << "px; font-family: sans-serif;' text-anchor='" << anchor << "'>" << txt << "</text>\n";
+    };
+
+    addLine(40, 65, 100, 65, 1);
+
+    if (type == "External") {
+        addLine(55, 60, 95, 60, 3);
+        addLine(55, 12, 55, 62, 3);
+        if (!upper.empty()) addText(35, 30, upper, 18, "end");
+        if (!lower.empty()) addText(35, 55, lower, 18, "end");
+    } else if (type == "Internal") {
+        addLine(55, 12, 95, 12, 3);
+        addLine(95, 12, 95, 62, 3);
+        if (!upper.empty()) addText(75, 40, upper, 18, "middle");
+        if (!lower.empty()) addText(75, 55, lower, 18, "middle");
+    } else {
+        addLine(55, 40, 75, 12, 3);
+        if (!upper.empty()) addText(45, 30, upper, 18, "end");
+        if (!lower.empty()) addText(45, 55, lower, 18, "end");
+    }
+
+    svgStream << "</svg>\n";
+    std::string svg = svgStream.str();
+    
     QByteArray ba(svg.c_str(), svg.length());
     QGraphicsSvgItem* svgItem = new QGraphicsSvgItem();
     QSvgRenderer* renderer = new QSvgRenderer(ba, svgItem);
@@ -158,91 +128,79 @@ void TaskEdgeSymbol::updatePreview()
     ui->graphicsView->fitInView(svgItem, Qt::KeepAspectRatio);
 }
 
-std::string TaskEdgeSymbol::buildSvg()
+void TaskEdgeSymbol::updateFeature()
 {
-    EdgeSvgString svg(100, 100);
+    if (!m_symbol) return;
     
-    std::string type = ui->cbEdgeType->currentText().toStdString();
-    std::string upper = ui->leUpper->text().toStdString();
-    std::string lower = ui->leLower->text().toStdString();
-    bool hasLeader = ui->cbLeader->isChecked();
-
-    if (hasLeader) {
-        svg.addArrow(40, 65, 13, 90);
-    }
-
-    // Basic layout for ISO 13715
-    svg.addLine(40, 65, 100, 65, 1); // Reference line
-
-    if (type == "External") {
-        svg.addLine(55, 60, 95, 60, 3); // Horizontal corner
-        svg.addLine(55, 12, 55, 62, 3); // Vertical corner
-        if (!upper.empty()) svg.addText(35, 30, upper, 18, "end");
-        if (!lower.empty()) svg.addText(35, 55, lower, 18, "end");
-    } else if (type == "Internal") {
-        svg.addLine(55, 12, 95, 12, 3);
-        svg.addLine(95, 12, 95, 62, 3);
-        if (!upper.empty()) svg.addText(75, 40, upper, 18, "middle");
-        if (!lower.empty()) svg.addText(75, 55, lower, 18, "middle");
-    } else {
-        // Undefined / Basic
-        svg.addLine(55, 40, 75, 12, 3);
-        if (!upper.empty()) svg.addText(45, 30, upper, 18, "end");
-        if (!lower.empty()) svg.addText(45, 55, lower, 18, "end");
-    }
-
-    return svg.finish();
+    m_symbol->EdgeType.setValue(ui->cbEdgeType->currentText().toStdString());
+    m_symbol->UpperDeviation.setValue(ui->leUpper->text().toStdString());
+    m_symbol->LowerDeviation.setValue(ui->leLower->text().toStdString());
+    m_symbol->Rotation.setValue(ui->leAngle->text().toDouble());
 }
 
 bool TaskEdgeSymbol::accept()
 {
-    Gui::Command::openCommand(QT_TRANSLATE_NOOP("Command", "Edge Symbol"));
-    App::Document *doc = Gui::Application::Instance->activeDocument()->getDocument();
-    auto* symbol = doc->addObject<TechDraw::DrawViewSymbol>("EdgeSymbol");
-    symbol->Symbol.setValue(buildSvg());
-    symbol->Rotation.setValue(ui->leAngle->text().toDouble());
+    if (m_createMode) {
+        Gui::Command::openCommand(QT_TRANSLATE_NOOP("Command", "Create Edge Symbol"));
+        
+        App::Document *doc = Gui::Application::Instance->activeDocument()->getDocument();
+        m_symbol = doc->addObject<TechDraw::DrawEdgeSymbol>("EdgeSymbol");
+        
+        m_symbol->Leader.setValue(m_leader);
+        
+        auto page = dynamic_cast<TechDraw::DrawPage *>(m_leader->findParentPage());
+        if (!page) {
+            page = TechDrawGui::DrawGuiUtil::findPage(nullptr);
+        }
+        
+        if (page) {
+            page->addView(m_symbol);
+        } else {
+            Base::Console().warning("EdgeSymbol: Could not find a suitable TechDraw Page to attach to.\n");
+        }
+        
+        updateFeature();
 
-    auto view = dynamic_cast<TechDraw::DrawView *>(owner);
-    symbol->Owner.setValue(view);
-    symbol->X.setValue(placement.x);
-    symbol->Y.setValue(placement.y);
+        auto viewProvider = dynamic_cast<ViewProviderEdgeSymbol *>(QGIView::getViewProvider(m_symbol));
+        if (viewProvider) {
+            viewProvider->StackOrder.setValue(ZVALUE::DIMENSION);
+        }
 
-    auto viewProvider = dynamic_cast<ViewProviderSymbol *>(QGIView::getViewProvider(symbol));
-    if (viewProvider) {
-        viewProvider->StackOrder.setValue(ZVALUE::DIMENSION);
-    }
-
-    auto page = dynamic_cast<TechDraw::DrawPage *>(owner);
-    if (!page && view) {
-        page = view->findParentPage();
-    }
-    
-    // Fallback: If no page was explicitly selected or found via view, find the active page
-    if (!page) {
-        page = TechDrawGui::DrawGuiUtil::findPage(nullptr);
-    }
-    
-    if (page) {
-        page->addView(symbol);
+        Gui::Command::commitCommand();
+        if (m_symbol) m_symbol->recomputeFeature();
+        if (page) page->recomputeFeature();
     } else {
-        Base::Console().warning("EdgeSymbol: Could not find a suitable TechDraw Page to attach to.\n");
+        Gui::Command::openCommand(QT_TRANSLATE_NOOP("Command", "Edit Edge Symbol"));
+        updateFeature();
+        Gui::Command::commitCommand();
+        if (m_symbol) m_symbol->recomputeFeature();
     }
-
-    Gui::Command::commitCommand();
-    if (symbol) symbol->recomputeFeature();
-    if (page) page->recomputeFeature();
+    
+    Gui::Command::doCommand(Gui::Command::Gui, "Gui.ActiveDocument.resetEdit()");
     return true;
 }
 
 bool TaskEdgeSymbol::reject()
 {
+    Gui::Command::doCommand(Gui::Command::Gui, "App.activeDocument().recompute()");
+    Gui::Command::doCommand(Gui::Command::Gui, "Gui.ActiveDocument.resetEdit()");
     return true;
 }
 
-TaskDlgEdgeSymbol::TaskDlgEdgeSymbol(const std::string &ownerName)
+TaskDlgEdgeSymbol::TaskDlgEdgeSymbol(TechDraw::DrawLeaderLine *leader)
     : TaskDialog()
 {
-    widget  = new TaskEdgeSymbol(ownerName);
+    widget  = new TaskEdgeSymbol(leader);
+    taskbox = new Gui::TaskView::TaskBox(Gui::BitmapFactory().pixmap("actions/TechDraw_EdgeSymbol"),
+                                             widget->windowTitle(), true, nullptr);
+    taskbox->groupLayout()->addWidget(widget);
+    Content.push_back(taskbox);
+}
+
+TaskDlgEdgeSymbol::TaskDlgEdgeSymbol(TechDraw::DrawEdgeSymbol *symbol)
+    : TaskDialog()
+{
+    widget  = new TaskEdgeSymbol(symbol);
     taskbox = new Gui::TaskView::TaskBox(Gui::BitmapFactory().pixmap("actions/TechDraw_EdgeSymbol"),
                                              widget->windowTitle(), true, nullptr);
     taskbox->groupLayout()->addWidget(widget);
