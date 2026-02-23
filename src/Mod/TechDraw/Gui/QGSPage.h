@@ -56,7 +56,8 @@ class DrawLeaderLine;
 class DrawViewBalloon;
 class DrawRichAnno;
 class DrawWeldSymbol;
-}// namespace TechDraw
+class DrawEdgeSymbol;
+}  // namespace TechDraw
 
 namespace TechDrawGui
 {
@@ -94,6 +95,7 @@ public:
     QGIView* addViewLeader(TechDraw::DrawLeaderLine* leaderFeat);
     QGIView* addRichAnno(TechDraw::DrawRichAnno* richFeat);
     QGIView* addWeldSymbol(TechDraw::DrawWeldSymbol* weldFeat);
+    QGIView* addEdgeSymbol(TechDraw::DrawEdgeSymbol* edgeFeat);
 
     void addChildrenToPage();
     void fixOrphans(bool force = false);
@@ -104,8 +106,10 @@ public:
     QGIView* findQViewForDocObj(App::DocumentObject* obj) const;
     QGIView* getQGIVByName(std::string name) const;
     QGIView* findParent(QGIView*) const;
-    void findMissingViews(const std::vector<App::DocumentObject*>& list,
-                          std::vector<App::DocumentObject*>& missing);
+    void findMissingViews(
+        const std::vector<App::DocumentObject*>& list,
+        std::vector<App::DocumentObject*>& missing
+    );
     bool hasQView(App::DocumentObject* obj);
 
     void addBalloonToParent(QGIViewBalloon* balloon, QGIView* parent);
@@ -136,11 +140,23 @@ public:
     TechDraw::DrawPage* getDrawPage();
 
     void setExportingSvg(bool enable);
-    bool getExportingSvg() const { return m_exportingSvg; }
+    bool getExportingSvg() const
+    {
+        return m_exportingSvg;
+    }
 
-    void setExportingPdf(bool enable) { m_exportingPdf = enable; };
-    bool getExportingPdf() const { return m_exportingPdf; }
-    bool getExportingAny() const { return getExportingPdf() || getExportingSvg(); }
+    void setExportingPdf(bool enable)
+    {
+        m_exportingPdf = enable;
+    };
+    bool getExportingPdf() const
+    {
+        return m_exportingPdf;
+    }
+    bool getExportingAny() const
+    {
+        return getExportingPdf() || getExportingSvg();
+    }
 
     virtual void refreshViews();
 
@@ -155,7 +171,7 @@ public:
     static Qt::KeyboardModifiers cleanModifierList(Qt::KeyboardModifiers mods);
 
 protected:
-    void mousePressEvent(QGraphicsSceneMouseEvent *event) override;
+    void mousePressEvent(QGraphicsSceneMouseEvent* event) override;
 
     QColor getBackgroundColor();
     bool orphanExists(const char* viewName, const std::vector<App::DocumentObject*>& list);
@@ -164,10 +180,10 @@ private:
     QGITemplate* pageTemplate;
     ViewProviderPage* m_vpPage;
 
-    bool m_exportingSvg{false};
-    bool m_exportingPdf{false};
+    bool m_exportingSvg {false};
+    bool m_exportingPdf {false};
 };
 
-}// namespace TechDrawGui
+}  // namespace TechDrawGui
 
-#endif// TECHDRAWGUI_QGSCENE_H
+#endif  // TECHDRAWGUI_QGSCENE_H

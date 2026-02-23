@@ -318,6 +318,8 @@ SET(TechDrawGuiView_SRCS
     QGMText.cpp
     QGIWeldSymbol.h
     QGIWeldSymbol.cpp
+    QGIEdgeSymbol.h
+    QGIEdgeSymbol.cpp
     QGITile.h
     QGITile.cpp
     QGIUserTypes.h
