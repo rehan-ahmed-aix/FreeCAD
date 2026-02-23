@@ -16,6 +16,8 @@
 using namespace TechDrawGui;
 using namespace TechDraw;
 
+using DU = DrawUtil;
+
 QGIEdgeSymbol::QGIEdgeSymbol()
     : m_svgItem(nullptr)
 {
@@ -92,8 +94,10 @@ void QGIEdgeSymbol::draw()
 QPointF QGIEdgeSymbol::getTailPoint()
 {
     auto leader = getLeader();
-    if (!leader) return QPointF(0, 0);
-    
+    if (!leader) {
+        return QPointF(0, 0);
+    }
+
     Base::Vector3d org = leader->getTailPoint();
     return DU::toQPointF(Rez::guiX(org));
 }
@@ -101,11 +105,13 @@ QPointF QGIEdgeSymbol::getTailPoint()
 double QGIEdgeSymbol::getLastSegAngle()
 {
     auto leader = getLeader();
-    if (!leader) return 0.0;
-    
+    if (!leader) {
+        return 0.0;
+    }
+
     auto lastSegDirection = leader->lastSegmentDirection();
     auto lastSegAngleRad = DU::angleWithX(lastSegDirection);
-    return Base::toDegrees(lastSegAngleRad);
+    return lastSegAngleRad * 180.0 / M_PI;
 }
 
 TechDraw::DrawEdgeSymbol* QGIEdgeSymbol::getFeature()
@@ -122,7 +128,7 @@ TechDraw::DrawLeaderLine* QGIEdgeSymbol::getLeader()
     return dynamic_cast<TechDraw::DrawLeaderLine*>(feature->Leader.getValue());
 }
 
-void QGIEdgeSymbol::paint(QPainter *painter, const QStyleOptionGraphicsItem *option, QWidget *widget)
+void QGIEdgeSymbol::paint(QPainter* painter, const QStyleOptionGraphicsItem* option, QWidget* widget)
 {
     QStyleOptionGraphicsItem myOption(*option);
     myOption.state &= ~QStyle::State_Selected;
@@ -138,7 +144,6 @@ QRectF QGIEdgeSymbol::boundingRect() const
 }
 
 void QGIEdgeSymbol::drawBorder()
-{
-}
+{}
 
 #include <Mod/TechDraw/Gui/moc_QGIEdgeSymbol.cpp>
