@@ -1526,6 +1526,7 @@ protected:
 void CmdSketcherConstraint::activated(int /*iMsg*/)
 {
     ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
     getSelection().clearSelection();
 }
 
@@ -3202,6 +3203,7 @@ void CmdSketcherDimension::activated(int iMsg)
     }
 
     ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerDimension>(SubNames));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
 }
 
 void CmdSketcherDimension::updateAction(int mode)
@@ -3308,12 +3310,13 @@ void horVerActivated(CmdSketcherConstraint* cmd, std::string type)
 
         if (constraintMode) {
             ActivateHandler(cmd->getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(cmd));
+            Gui::Application::Instance->commandManager().setActiveToolCommand(cmd->getName());
             Gui::Command::getSelection().clearSelection();
         }
         else {
             Gui::TranslatedUserWarning(cmd->getActiveGuiDocument(),
-                QObject::tr("Wrong selection"),
-                QObject::tr("Select an edge from the sketch."));
+                    QObject::tr("Wrong selection"),
+                    QObject::tr("Select an edge from the sketch."));
         }
         return;
     }
@@ -3715,6 +3718,7 @@ void CmdSketcherConstrainLock::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -4001,6 +4005,7 @@ void CmdSketcherConstrainBlock::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -4334,6 +4339,7 @@ void CmdSketcherConstrainCoincidentUnified::onActivated(CoincicenceType type)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -4824,6 +4830,8 @@ void CmdSketcherConstrainDistance::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
+
 
             getSelection().clearSelection();
         }
@@ -5475,6 +5483,7 @@ void CmdSketcherConstrainDistanceX::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -5776,6 +5785,7 @@ void CmdSketcherConstrainDistanceY::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -6072,6 +6082,7 @@ void CmdSketcherConstrainParallel::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -6245,6 +6256,7 @@ void CmdSketcherConstrainPerpendicular::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -7101,6 +7113,7 @@ void CmdSketcherConstrainTangent::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -7928,6 +7941,7 @@ void CmdSketcherConstrainRadius::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -8291,6 +8305,7 @@ void CmdSketcherConstrainDiameter::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -8609,6 +8624,7 @@ void CmdSketcherConstrainRadiam::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -9152,6 +9168,7 @@ void CmdSketcherConstrainAngle::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -9593,6 +9610,7 @@ void CmdSketcherConstrainEqual::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
@@ -9852,6 +9870,7 @@ void CmdSketcherConstrainSymmetric::activated(int iMsg)
 
         if (constraintMode) {
             ActivateHandler(getActiveGuiDocument(), std::make_unique<DrawSketchHandlerGenConstraint>(this));
+    Gui::Application::Instance->commandManager().setActiveToolCommand(getName());
             getSelection().clearSelection();
         }
         else {
