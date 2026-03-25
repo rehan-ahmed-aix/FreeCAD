@@ -1456,7 +1456,7 @@ void SketcherCopy::activate(SketcherCopy::Op op)
     return;
     }
 */
-    
+
     Gui::Document* guidoc = getActiveGuiDocument();
     ActivateHandler(guidoc,
                     std::make_unique<DrawSketchHandlerCopy>(guidoc->getDocument(), geoIdList, LastGeoId, LastPointPos, geoids, op));
