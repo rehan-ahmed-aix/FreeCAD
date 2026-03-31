@@ -332,6 +332,7 @@ SET(PathPythonPostScripts_SRCS
     Path/Post/scripts/generic_plasma_post.py
     Path/Post/scripts/grbl_post.py
     Path/Post/scripts/heidenhain_legacy_post.py
+    Path/Post/scripts/KineticNCBeamicon2_legacy_post.py
     Path/Post/scripts/linuxcnc_post.py
     Path/Post/scripts/linuxcnc_legacy_post.py
     Path/Post/scripts/jtech_legacy_post.py
@@ -517,6 +518,7 @@ SET(Tests_SRCS
     CAMTests/test_holes00.fcstd
     CAMTests/TestCAMSanity.py
     CAMTests/TestCentroidLegacyPost.py
+    CAMTests/TestDxfPost.py
     CAMTests/TestFanucPost.py
     CAMTests/TestGenericPost.py
     CAMTests/TestGenericPlasma.py
@@ -587,6 +589,7 @@ SET(Tests_SRCS
     CAMTests/TestPostMCodes.py
     CAMTests/TestSnapmakerPost.py
     CAMTests/TestPostToolProcessing.py
+    CAMTests/TestSVGPost.py
     CAMTests/TestTSPSolver.py
     CAMTests/TestGcodeProcessingUtils.py
     CAMTests/Tools/Bit/test-path-tool-bit-bit-00.fctb
