@@ -296,9 +296,17 @@ std::string Quantity::getUserString(UnitsSchema* schema, double& factor, std::st
 std::string Quantity::getSafeUserString() const
 {
     auto userStr = getUserString();
-    if (myValue != 0.0 && parse(userStr).getValue() == 0) {
-        auto unitStr = getUnit().getString();
-        userStr = fmt::format("{}{}{}", myValue, unitStr.empty() ? "" : " ", unitStr);
+    if (myValue != 0.0) {
+        try {
+            if (parse(userStr).getValue() == 0) {
+                auto unitStr = getUnit().getString();
+                userStr = fmt::format("{}{}{}", myValue, unitStr.empty() ? "" : " ", unitStr);
+            }
+        }
+        catch (const Base::ParserError&) {
+            auto unitStr = getUnit().getString();
+            userStr = fmt::format("{}{}{}", myValue, unitStr.empty() ? "" : " ", unitStr);
+        }
     }
 
     return Tools::escapeQuotesFromString(userStr);
