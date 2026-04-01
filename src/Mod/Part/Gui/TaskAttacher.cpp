@@ -1546,7 +1546,7 @@ bool TaskDlgAttacher::reject()
     Gui::Document* document = doc.getDocument();
     if (document) {
         // roll back the done things
-        Gui::Command::abortCommand(tid);
+        document->abortCommand();
         Gui::Command::doCommand(Gui::Command::Doc, "%s.recompute()", doc.getAppDocumentPython().c_str());
     }
 
